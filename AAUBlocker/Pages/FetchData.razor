@@ -2,8 +2,9 @@
 @inject HttpClient Http
 
 <h1>Weather forecast</h1>
-<p>This component demonstrates fetching data from the server.</p>
-<button @onclick=@OnInitializedAsync>Refresh</button>
+<p>This component demonstrates fetching data from the server. ( Fake 1 second delay to mock latency )</p>
+<div><button @onclick=@RefreshWithDisable>Refresh With Input Disabling</button></div>
+<div><button @onclick=@RefreshWithoutDisable>Refresh Without Input Disabling</button></div>
 
 @if (forecasts == null)
 {
@@ -39,9 +40,18 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        forecasts = await Http.GetJsonAsyncUI<WeatherForecast[]>("sample-data/weather.json");
+        await Refresh(false);
     }
 
+    Task RefreshWithDisable() => Refresh(true);
+    Task RefreshWithoutDisable() => Refresh(false);
+
+    async Task Refresh(bool WithDisable)
+    {
+        forecasts = null;
+        forecasts = await Http.GetJsonAsync<WeatherForecast[]>("sample-data/weather.json",WithDisable,MockDelay: 1200);
+
+    }
     public class WeatherForecast
     {
         public DateTime Date { get; set; }
